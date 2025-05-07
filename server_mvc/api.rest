@@ -1,0 +1,118 @@
+GET http://localhost:8000/aprendices
+###
+POST http://localhost:8000/aprendices
+Content-Type: application/json
+
+{
+    "nombre": "sebastian",
+    "apellido": "preciado",
+    "email": "sebas@gmail",
+    "telefono": "323148382"
+}
+###
+PUT http://localhost:8000/aprendices/
+
+###
+DELETE http://localhost:8000/aprendices/
+
+###
+GET http://localhost:8000/profesion
+###
+POST http://localhost:8000/profesion
+Content-Type:  application/json
+
+ {
+    "nombre_profesion": "ingeniero de software"
+ }
+ ###
+PUT http://localhost:8000/profesion/
+
+ ###
+DELETE http://localhost:8000/profesion/
+
+
+###
+GET http://localhost:8000/instructores
+###
+POST http://localhost:8000/instructores
+Content-Type: application/json
+
+{
+ "nombre": "Jhonatan",
+ "apellido": "Preciado",
+ "email": "jho@gmail",
+ "telefono": "3211234531"
+} 
+###
+PUT http://localhost:8000/instructores/
+
+###
+DELETE http://localhost:8000/instructores/
+
+###
+GET http://localhost:8000/programas
+###
+POST http://localhost:8000/programas
+Content-Type: application/json
+
+ {
+   "nombre_programa": "ADSO"
+ }
+###
+PUT http://localhost:8000/programas/
+
+
+###
+DELETE http://localhost:8000/programas/
+###
+GET http://localhost:8000/fichas
+###
+POST http://localhost:8000/fichas
+Content-Type: application/json
+
+ {
+  "codigo": "2827167",
+  "fechaInicioL": "2024-07-12",
+  "fechaFinL": "2026-04-12",
+  "fechaFinP": "2026-10-20",
+  "idPrograma": 1
+ } 
+###
+PUT http://localhost:8000/fichas/
+
+
+###
+DELETE http://localhost:8000/fichas/
+###
+GET http://localhost:8000/fichaAprendiz
+###
+POST http://localhost:8000/fichaAprendiz
+Content-Type: application/json
+
+{
+ "idFicha": 1,
+ "idAprendiz": 1,
+ "idInstructor": 1
+}
+###
+PUT http://localhost:8000/fichaAprendiz/
+
+
+###
+DELETE http://localhost:8000/fichaAprendiz/
+###
+GET http://localhost:8000/instructorProfesion
+###
+POST http://localhost:8000/instructorProfesion
+Content-Type:  application/json
+
+{
+ "idInstructor": 1,
+ "idProfesion": 1
+}
+###
+PUT http://localhost:8000/instructorProfesion/
+
+
+###
+DELETE http://localhost:8000/instructorProfesion/
