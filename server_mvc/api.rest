@@ -4,16 +4,23 @@ POST http://localhost:8000/aprendices
 Content-Type: application/json
 
 {
-    "nombre": "sebastian",
-    "apellido": "preciado",
-    "email": "sebas@gmail",
-    "telefono": "323148382"
+    "nombre": "sebastiane",
+    "apellido": "preciadoe",
+    "email": "sebas@gmaile",
+    "telefono": "323148382e"
 }
 ###
-PUT http://localhost:8000/aprendices/
+PUT http://localhost:8000/aprendices/2
+Content-Type: application/json
 
+{
+  "nombre": "Juan",
+  "apellido": "Silva",
+  "email": "juan.Silva@sena.com",
+  "telefono": "3011708855"
+}
 ###
-DELETE http://localhost:8000/aprendices/
+DELETE http://localhost:8000/aprendices/3
 
 ###
 GET http://localhost:8000/profesion
@@ -44,10 +51,34 @@ Content-Type: application/json
  "telefono": "3211234531"
 } 
 ###
-PUT http://localhost:8000/instructores/
+PUT http://localhost:8000/instructores/2
+Content-Type: application/json
 
+{
+  "nombre": "María",
+  "apel
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  lido": "Rodríguez",
+  "email": "maria.rodriguez@ejemplo.com",
+  "telefono": "3109876543"
+}
 ###
-DELETE http://localhost:8000/instructores/
+DELETE http://localhost:8000/instructores/3
 
 ###
 GET http://localhost:8000/programas
