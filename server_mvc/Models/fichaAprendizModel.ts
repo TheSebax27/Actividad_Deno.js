@@ -51,4 +51,118 @@ export class FichaAprendiz {
             }
         }
     }
+    
+    public async actualizarFichaAprendiz(): Promise<{ success: boolean; mensaje: string; ids?: Record<string, unknown> }> {
+        try {
+            if (!this._objFichaAprendiz || !this._idfichaAprendiz) {
+                throw new Error("No se ha proporcionado un objeto FichaAprendiz o un ID.");
+            }
+            
+            const { ficha_idficha, aprendiz_idaprendiz, instructor_idinstructor } = this._objFichaAprendiz;
+            if (!ficha_idficha || !aprendiz_idaprendiz || !instructor_idinstructor) {
+                throw new Error("Faltan datos de la ficha aprendiz.");
+            }
+            
+            await conexion.execute("START TRANSACTION;");
+            
+           
+            const { rows: existeRelacion } = await conexion.execute(
+                "SELECT * FROM ficha_has_aprendiz WHERE ficha_idficha = ? AND aprendiz_idaprendiz = ? AND instructor_idinstructor = ?;", 
+                [this._idfichaAprendiz, aprendiz_idaprendiz, instructor_idinstructor]
+            );
+            
+            if (!existeRelacion || existeRelacion.length === 0) {
+                await conexion.execute("ROLLBACK;");
+                return { success: false, mensaje: "La relación no existe." };
+            }
+            
+           
+            const result = await conexion.execute(
+                "UPDATE ficha_has_aprendiz SET ficha_idficha = ?, aprendiz_idaprendiz = ?, instructor_idinstructor = ? " +
+                "WHERE ficha_idficha = ? AND aprendiz_idaprendiz = ? AND instructor_idinstructor = ?;", 
+                [ficha_idficha, aprendiz_idaprendiz, instructor_idinstructor, 
+                 this._idfichaAprendiz, existeRelacion[0].aprendiz_idaprendiz, existeRelacion[0].instructor_idinstructor]
+            );
+            
+            if (result && typeof result.affectedRows === "number" && result.affectedRows > 0) {
+                const { rows: relacion } = await conexion.execute(
+                    "SELECT * FROM ficha_has_aprendiz WHERE ficha_idficha = ? AND aprendiz_idaprendiz = ? AND instructor_idinstructor = ?;", 
+                    [ficha_idficha, aprendiz_idaprendiz, instructor_idinstructor]
+                );
+                
+                await conexion.execute("COMMIT;");
+                return { success: true, mensaje: "Relación actualizada correctamente", ids: relacion && relacion[0] ? relacion[0] : undefined };
+            } else {
+                await conexion.execute("ROLLBACK;");
+                throw new Error("No se pudo actualizar la relación.");
+            }
+        } catch (error) {
+            await conexion.execute("ROLLBACK;");
+            if (error instanceof z.ZodError) {
+                return { success: false, mensaje: error.message };
+            } else {
+                return { success: false, mensaje: `Error inesperado: ${error}` };
+            }
+        }
+    }
+    
+    public async eliminarFichaAprendiz(): Promise<{ success: boolean; mensaje: string }> {
+        try {
+            if (!this._objFichaAprendiz && !this._idfichaAprendiz) {
+                throw new Error("No se ha proporcionado información para eliminar la relación.");
+            }
+            
+            await conexion.execute("START TRANSACTION;");
+            
+         
+            const ficha_id = this._idfichaAprendiz || (this._objFichaAprendiz ? this._objFichaAprendiz.ficha_idficha : null);
+            if (!ficha_id) {
+                throw new Error("Falta el ID de la ficha.");
+            }
+            
+         
+            const { rows: existeFicha } = await conexion.execute(
+                "SELECT * FROM ficha_has_aprendiz WHERE ficha_idficha = ?;", 
+                [ficha_id]
+            );
+            
+            if (!existeFicha || existeFicha.length === 0) {
+                await conexion.execute("ROLLBACK;");
+                return { success: false, mensaje: "La ficha no existe o no tiene aprendices asignados." };
+            }
+            
+          
+            if (this._objFichaAprendiz && this._objFichaAprendiz.aprendiz_idaprendiz && this._objFichaAprendiz.instructor_idinstructor) {
+                const result = await conexion.execute(
+                    "DELETE FROM ficha_has_aprendiz WHERE ficha_idficha = ? AND aprendiz_idaprendiz = ? AND instructor_idinstructor = ?;", 
+                    [ficha_id, this._objFichaAprendiz.aprendiz_idaprendiz, this._objFichaAprendiz.instructor_idinstructor]
+                );
+                
+                if (result && typeof result.affectedRows === "number" && result.affectedRows > 0) {
+                    await conexion.execute("COMMIT;");
+                    return { success: true, mensaje: "Relación eliminada correctamente" };
+                } else {
+                    await conexion.execute("ROLLBACK;");
+                    return { success: false, mensaje: "No se encontró la relación específica" };
+                }
+            } else {
+               
+                const result = await conexion.execute(
+                    "DELETE FROM ficha_has_aprendiz WHERE ficha_idficha = ?;", 
+                    [ficha_id]
+                );
+                
+                if (result && typeof result.affectedRows === "number" && result.affectedRows > 0) {
+                    await conexion.execute("COMMIT;");
+                    return { success: true, mensaje: `Se eliminaron ${result.affectedRows} relaciones correctamente` };
+                } else {
+                    await conexion.execute("ROLLBACK;");
+                    throw new Error("No se pudieron eliminar las relaciones.");
+                }
+            }
+        } catch (error) {
+            await conexion.execute("ROLLBACK;");
+            return { success: false, mensaje: `Error al eliminar: ${error}` };
+        }
+    }
 }

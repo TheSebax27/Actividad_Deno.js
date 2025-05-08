@@ -47,5 +47,124 @@ export class InstructorProfesion {
                 }
             }
         }
-
+        
+    public async actualizarInstructorProfesion(): Promise<{ success: boolean; mensaje: string; data?: Record<string, unknown> }> {
+        try {
+            if (!this._objInstructorProfesion || !this._idInstructorProfesion) {
+                throw new Error("No se ha proporcionado la información necesaria para actualizar.");
+            }
+            
+            const { instructor_idinstructor, profesion_idprofesion } = this._objInstructorProfesion;
+            if (!instructor_idinstructor || !profesion_idprofesion) {
+                throw new Error("Faltan datos para la actualización.");
+            }
+            
+            await conexion.execute("START TRANSACTION;");
+            
+            
+            const { rows: existeRelacion } = await conexion.execute(
+                "SELECT * FROM instructor_has_profesion WHERE instructor_idinstructor = ? AND profesion_idprofesion = ?;", 
+                [this._idInstructorProfesion, profesion_idprofesion]
+            );
+            
+            if (!existeRelacion || existeRelacion.length === 0) {
+                await conexion.execute("ROLLBACK;");
+                return { success: false, mensaje: "La relación instructor-profesión no existe." };
+            }
+            
+            
+            const result = await conexion.execute(
+                "UPDATE instructor_has_profesion SET instructor_idinstructor = ?, profesion_idprofesion = ? WHERE instructor_idinstructor = ? AND profesion_idprofesion = ?;", 
+                [instructor_idinstructor, profesion_idprofesion, this._idInstructorProfesion, profesion_idprofesion]
+            );
+            
+            if (result && typeof result.affectedRows === "number" && result.affectedRows > 0) {
+                const { rows: relacion } = await conexion.execute(
+                    "SELECT * FROM instructor_has_profesion WHERE instructor_idinstructor = ? AND profesion_idprofesion = ?;", 
+                    [instructor_idinstructor, profesion_idprofesion]
+                );
+                
+                await conexion.execute("COMMIT;");
+                return { 
+                    success: true, 
+                    mensaje: "Relación instructor-profesión actualizada correctamente", 
+                    data: relacion && relacion[0] ? relacion[0] : undefined 
+                };
+            } else {
+                await conexion.execute("ROLLBACK;");
+                throw new Error("No se pudo actualizar la relación instructor-profesión.");
+            }
+        } catch (error) {
+            await conexion.execute("ROLLBACK;");
+            if (error instanceof z.ZodError) {
+                return { success: false, mensaje: error.message };
+            } else {
+                return { success: false, mensaje: `Error inesperado: ${error}` };
+            }
+        }
+    }
+    
+    public async eliminarInstructorProfesion(): Promise<{ success: boolean; mensaje: string }> {
+        try {
+            if (!this._objInstructorProfesion && !this._idInstructorProfesion) {
+                throw new Error("No se ha proporcionado información para eliminar.");
+            }
+            
+            await conexion.execute("START TRANSACTION;");
+            
+            let instructor_id: number;
+            let profesion_id: number;
+            
+            if (this._objInstructorProfesion) {
+              
+                instructor_id = this._objInstructorProfesion.instructor_idinstructor;
+                profesion_id = this._objInstructorProfesion.profesion_idprofesion;
+            } else {
+              
+                instructor_id = this._idInstructorProfesion as number;
+                
+               
+                const { rows: relaciones } = await conexion.execute(
+                    "SELECT * FROM instructor_has_profesion WHERE instructor_idinstructor = ?;", 
+                    [instructor_id]
+                );
+                
+                if (!relaciones || relaciones.length === 0) {
+                    await conexion.execute("ROLLBACK;");
+                    return { success: false, mensaje: "No existen relaciones para este instructor." };
+                }
+                
+             
+                profesion_id = (relaciones[0] as InstructorProfesionData).profesion_idprofesion;
+            }
+            
+           
+            const { rows: existeRelacion } = await conexion.execute(
+                "SELECT * FROM instructor_has_profesion WHERE instructor_idinstructor = ? AND profesion_idprofesion = ?;", 
+                [instructor_id, profesion_id]
+            );
+            
+            if (!existeRelacion || existeRelacion.length === 0) {
+                await conexion.execute("ROLLBACK;");
+                return { success: false, mensaje: "La relación instructor-profesión no existe." };
+            }
+            
+           
+            const result = await conexion.execute(
+                "DELETE FROM instructor_has_profesion WHERE instructor_idinstructor = ? AND profesion_idprofesion = ?;", 
+                [instructor_id, profesion_id]
+            );
+            
+            if (result && typeof result.affectedRows === "number" && result.affectedRows > 0) {
+                await conexion.execute("COMMIT;");
+                return { success: true, mensaje: "Relación instructor-profesión eliminada correctamente" };
+            } else {
+                await conexion.execute("ROLLBACK;");
+                throw new Error("No se pudo eliminar la relación instructor-profesión.");
+            }
+        } catch (error) {
+            await conexion.execute("ROLLBACK;");
+            return { success: false, mensaje: `Error al eliminar: ${error}` };
+        }
+    }
 }

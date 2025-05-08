@@ -51,5 +51,105 @@ export class Ficha{
             }
         }
     }
+
+    public async actualizarFicha(): Promise<{ success: boolean; mensaje: string; ficha?: Record<string, unknown> }> {
+        try {
+            if (!this._objFicha || !this._idficha) {
+                throw new Error("No se ha proporcionado un objeto ficha o un ID.");
+            }
+            
+            const { codigo, fecha_inicio_lectiva, fecha_fin_lectiva, fecha_fin_practica, programa_idprograma } = this._objFicha;
+            if (!codigo || !fecha_inicio_lectiva || !fecha_fin_lectiva || !fecha_fin_practica || !programa_idprograma) {
+                throw new Error("Faltan datos de la ficha.");
+            }
+            
+            await conexion.execute("START TRANSACTION;");
+            
+            
+            const { rows: existeFicha } = await conexion.execute(
+                "SELECT * FROM ficha WHERE idficha = ?;", 
+                [this._idficha]
+            );
+            
+            if (!existeFicha || existeFicha.length === 0) {
+                await conexion.execute("ROLLBACK;");
+                return { success: false, mensaje: "La ficha no existe." };
+            }
+            
+          
+            const result = await conexion.execute(
+                "UPDATE ficha SET codigo = ?, fecha_inicio_lectiva = ?, fecha_fin_lectiva = ?, fecha_fin_practica = ?, programa_idprograma = ? WHERE idficha = ?;", 
+                [codigo, fecha_inicio_lectiva, fecha_fin_lectiva, fecha_fin_practica, programa_idprograma, this._idficha]
+            );
+            
+            if (result && typeof result.affectedRows === "number" && result.affectedRows > 0) {
+                const { rows: ficha } = await conexion.execute("SELECT * FROM ficha WHERE idficha = ?;", [this._idficha]);
+                
+                await conexion.execute("COMMIT;");
+                return { success: true, mensaje: "Ficha actualizada correctamente", ficha: ficha && ficha[0] ? ficha[0] : undefined };
+            } else {
+                await conexion.execute("ROLLBACK;");
+                throw new Error("No se pudo actualizar la ficha.");
+            }
+        } catch (error) {
+            await conexion.execute("ROLLBACK;");
+            if (error instanceof z.ZodError) {
+                return { success: false, mensaje: error.message };
+            } else {
+                return { success: false, mensaje: `Error inesperado: ${error}` };
+            }
+        }
+    }
     
+    public async eliminarFicha(): Promise<{ success: boolean; mensaje: string }> {
+        try {
+            if (!this._idficha) {
+                throw new Error("No se ha proporcionado un ID de ficha.");
+            }
+            
+            await conexion.execute("START TRANSACTION;");
+            
+       
+            const { rows: existeFicha } = await conexion.execute(
+                "SELECT * FROM ficha WHERE idficha = ?;", 
+                [this._idficha]
+            );
+            
+            if (!existeFicha || existeFicha.length === 0) {
+                await conexion.execute("ROLLBACK;");
+                return { success: false, mensaje: "La ficha no existe." };
+            }
+            
+           
+            const { rows: referenciasAprendiz } = await conexion.execute(
+                "SELECT * FROM ficha_has_aprendiz WHERE ficha_idficha = ?;", 
+                [this._idficha]
+            );
+            
+           
+            if (referenciasAprendiz && referenciasAprendiz.length > 0) {
+                await conexion.execute(
+                    "DELETE FROM ficha_has_aprendiz WHERE ficha_idficha = ?;", 
+                    [this._idficha]
+                );
+            }
+            
+         
+            const result = await conexion.execute(
+                "DELETE FROM ficha WHERE idficha = ?;", 
+                [this._idficha]
+            );
+            
+            if (result && typeof result.affectedRows === "number" && result.affectedRows > 0) {
+                await conexion.execute("COMMIT;");
+                return { success: true, mensaje: "Ficha eliminada correctamente" };
+            } else {
+                await conexion.execute("ROLLBACK;");
+                throw new Error("No se pudo eliminar la ficha.");
+            }
+        } catch (error) {
+            await conexion.execute("ROLLBACK;");
+            return { success: false, mensaje: `Error al eliminar: ${error}` };
+        }
+    }
 }

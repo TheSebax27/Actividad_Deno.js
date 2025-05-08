@@ -1,15 +1,18 @@
+# Aprendices
 GET http://localhost:8000/aprendices
 ###
+
 POST http://localhost:8000/aprendices
 Content-Type: application/json
 
 {
-    "nombre": "sebastiane",
-    "apellido": "preciadoe",
-    "email": "sebas@gmaile",
-    "telefono": "323148382e"
+    "nombre": "Sebastian",
+    "apellido": "Preciado",
+    "email": "sebas@gmail.com",
+    "telefono": "3231483822"
 }
 ###
+
 PUT http://localhost:8000/aprendices/2
 Content-Type: application/json
 
@@ -20,103 +23,120 @@ Content-Type: application/json
   "telefono": "3011708855"
 }
 ###
-DELETE http://localhost:8000/aprendices/3
 
+DELETE http://localhost:8000/aprendices/3
 ###
+
+# Profesiones
 GET http://localhost:8000/profesion
 ###
+
 POST http://localhost:8000/profesion
-Content-Type:  application/json
+Content-Type: application/json
 
- {
+{
     "nombre_profesion": "ingeniero de software"
- }
- ###
-PUT http://localhost:8000/profesion/
-
- ###
-DELETE http://localhost:8000/profesion/
-
-
+}
 ###
+
+PUT http://localhost:8000/profesion/1
+Content-Type: application/json
+
+{
+    "nombre_profesion": "ingeniero de sistemas"
+}
+###
+
+DELETE http://localhost:8000/profesion/2
+###
+
+# Instructores
 GET http://localhost:8000/instructores
 ###
+
 POST http://localhost:8000/instructores
 Content-Type: application/json
 
 {
  "nombre": "Jhonatan",
  "apellido": "Preciado",
- "email": "jho@gmail",
+ "email": "jho@gmail.com",
  "telefono": "3211234531"
-} 
+}
 ###
+
 PUT http://localhost:8000/instructores/2
 Content-Type: application/json
 
 {
   "nombre": "María",
-  "apel
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  lido": "Rodríguez",
+  "apellido": "Rodríguez",
   "email": "maria.rodriguez@ejemplo.com",
   "telefono": "3109876543"
 }
 ###
-DELETE http://localhost:8000/instructores/3
 
+DELETE http://localhost:8000/instructores/3
 ###
+
+# Programas
 GET http://localhost:8000/programas
 ###
+
 POST http://localhost:8000/programas
 Content-Type: application/json
 
- {
+{
    "nombre_programa": "ADSO"
- }
+}
 ###
-PUT http://localhost:8000/programas/
 
+PUT http://localhost:8000/programas/1
+Content-Type: application/json
 
+{
+   "nombre_programa": "Análisis y Desarrollo de Software"
+}
 ###
-DELETE http://localhost:8000/programas/
+
+DELETE http://localhost:8000/programas/2
 ###
+
+# Fichas
 GET http://localhost:8000/fichas
 ###
+
 POST http://localhost:8000/fichas
 Content-Type: application/json
 
- {
+{
   "codigo": "2827167",
   "fechaInicioL": "2024-07-12",
   "fechaFinL": "2026-04-12",
   "fechaFinP": "2026-10-20",
   "idPrograma": 1
- } 
+}
 ###
-PUT http://localhost:8000/fichas/
 
+PUT http://localhost:8000/fichas/1
+Content-Type: application/json
 
+{
+  "codigo": "2827168",
+  "fechaInicioL": "2024-08-12",
+  "fechaFinL": "2026-05-12",
+  "fechaFinP": "2026-11-20",
+  "idPrograma": 1
+}
 ###
-DELETE http://localhost:8000/fichas/
+
+DELETE http://localhost:8000/fichas/2
 ###
+
+# Ficha-Aprendiz
 GET http://localhost:8000/fichaAprendiz
 ###
+
 POST http://localhost:8000/fichaAprendiz
 Content-Type: application/json
 
@@ -126,24 +146,41 @@ Content-Type: application/json
  "idInstructor": 1
 }
 ###
-PUT http://localhost:8000/fichaAprendiz/
 
+PUT http://localhost:8000/fichaAprendiz/1
+Content-Type: application/json
 
+{
+ "idFicha": 1,
+ "idAprendiz": 2,
+ "idInstructor": 1
+}
 ###
-DELETE http://localhost:8000/fichaAprendiz/
+
+DELETE http://localhost:8000/fichaAprendiz/1
 ###
+
+# Instructor-Profesion
 GET http://localhost:8000/instructorProfesion
 ###
+
 POST http://localhost:8000/instructorProfesion
-Content-Type:  application/json
+Content-Type: application/json
 
 {
  "idInstructor": 1,
  "idProfesion": 1
 }
 ###
-PUT http://localhost:8000/instructorProfesion/
 
+PUT http://localhost:8000/instructorProfesion/1
+Content-Type: application/json
 
+{
+ "idInstructor": 1,
+ "idProfesion": 2
+}
 ###
-DELETE http://localhost:8000/instructorProfesion/
+
+DELETE http://localhost:8000/instructorProfesion/1
+###
