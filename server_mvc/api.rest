@@ -177,7 +177,7 @@ PUT http://localhost:8000/instructorProfesion/3
 Content-Type: application/json
 
 {
- "nuevoID":2,
+ "nuevoInstructorID":2,
  "idProfesion": 1
 }
 ###
