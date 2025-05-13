@@ -58,36 +58,42 @@ export class FichaAprendiz {
                 throw new Error("No se ha proporcionado un objeto FichaAprendiz o un ID.");
             }
             
-            const { ficha_idficha, aprendiz_idaprendiz, instructor_idinstructor } = this._objFichaAprendiz;
-            if (!ficha_idficha || !aprendiz_idaprendiz || !instructor_idinstructor) {
+            const fichaID = this._idfichaAprendiz;
+            const {aprendiz_idaprendiz, instructor_idinstructor} = this._objFichaAprendiz;
+            if (!fichaID || !aprendiz_idaprendiz || !instructor_idinstructor) {
                 throw new Error("Faltan datos de la ficha aprendiz.");
             }
             
             await conexion.execute("START TRANSACTION;");
             
-           
-            const { rows: existeRelacion } = await conexion.execute(
-                "SELECT * FROM ficha_has_aprendiz WHERE ficha_idficha = ? AND aprendiz_idaprendiz = ? AND instructor_idinstructor = ?;", 
-                [this._idfichaAprendiz, aprendiz_idaprendiz, instructor_idinstructor]
-            );
-            
-            if (!existeRelacion || existeRelacion.length === 0) {
+            const { rows: existe } = await conexion.execute(
+                `SELECT * 
+                   FROM ficha_has_aprendiz 
+                  WHERE ficha_idficha     = ?
+                    AND aprendiz_idaprendiz = ?;`,
+                [fichaID, aprendiz_idaprendiz]
+              );
+              if (!existe || existe.length === 0) {
                 await conexion.execute("ROLLBACK;");
                 return { success: false, mensaje: "La relación no existe." };
-            }
+              }
             
            
             const result = await conexion.execute(
-                "UPDATE ficha_has_aprendiz SET ficha_idficha = ?, aprendiz_idaprendiz = ?, instructor_idinstructor = ? " +
-                "WHERE ficha_idficha = ? AND aprendiz_idaprendiz = ? AND instructor_idinstructor = ?;", 
-                [ficha_idficha, aprendiz_idaprendiz, instructor_idinstructor, 
-                 this._idfichaAprendiz, existeRelacion[0].aprendiz_idaprendiz, existeRelacion[0].instructor_idinstructor]
+                `UPDATE ficha_has_aprendiz
+            SET instructor_idinstructor = ?
+          WHERE ficha_idficha     = ?
+            AND aprendiz_idaprendiz = ?;`, 
+                [instructor_idinstructor,fichaID,aprendiz_idaprendiz]
             );
             
             if (result && typeof result.affectedRows === "number" && result.affectedRows > 0) {
                 const { rows: relacion } = await conexion.execute(
-                    "SELECT * FROM ficha_has_aprendiz WHERE ficha_idficha = ? AND aprendiz_idaprendiz = ? AND instructor_idinstructor = ?;", 
-                    [ficha_idficha, aprendiz_idaprendiz, instructor_idinstructor]
+                    `SELECT * 
+                    FROM ficha_has_aprendiz 
+                   WHERE ficha_idficha        = ?
+                     AND aprendiz_idaprendiz  = ?;`,
+                 [fichaID, aprendiz_idaprendiz]
                 );
                 
                 await conexion.execute("COMMIT;");

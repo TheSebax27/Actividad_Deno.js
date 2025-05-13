@@ -57,7 +57,7 @@ export const putInstructorProfesion = async(ctx: any) => {
 
         const body = await request.body.json();
         const data = {
-            instructor_idinstructor: body.idInstructor,
+            instructor_idinstructor: body.nuevoID,
             profesion_idprofesion: body.idProfesion
         };
 

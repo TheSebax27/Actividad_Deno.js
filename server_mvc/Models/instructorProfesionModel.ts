@@ -7,14 +7,14 @@ interface InstructorProfesionData {
 }
 export class InstructorProfesion {
     public _objInstructorProfesion: InstructorProfesionData | null;
-    public _idInstructorProfesion: number | null;
-
+    public _oldidInstructorProfesion: number | null;
+ 
     /**
      *
      */
     constructor(objInstructorProfesion: InstructorProfesionData | null = null, idInstructorProfesion: number | null = null) {
         this._objInstructorProfesion = objInstructorProfesion;
-        this._idInstructorProfesion = idInstructorProfesion;
+        this._oldidInstructorProfesion = idInstructorProfesion;
     }
     public async seleccionarInstructorProfesion(): Promise<InstructorProfesionData[]> {
             const { rows: inst } = await conexion.execute("SELECT * FROM instructor_has_profesion");
@@ -50,7 +50,7 @@ export class InstructorProfesion {
         
     public async actualizarInstructorProfesion(): Promise<{ success: boolean; mensaje: string; data?: Record<string, unknown> }> {
         try {
-            if (!this._objInstructorProfesion || !this._idInstructorProfesion) {
+            if (!this._objInstructorProfesion || !this._oldidInstructorProfesion) {
                 throw new Error("No se ha proporcionado la información necesaria para actualizar.");
             }
             
@@ -58,29 +58,27 @@ export class InstructorProfesion {
             if (!instructor_idinstructor || !profesion_idprofesion) {
                 throw new Error("Faltan datos para la actualización.");
             }
-            
+            const oldi = this._oldidInstructorProfesion;
             await conexion.execute("START TRANSACTION;");
             
             
-            const { rows: existeRelacion } = await conexion.execute(
-                "SELECT * FROM instructor_has_profesion WHERE instructor_idinstructor = ? AND profesion_idprofesion = ?;", 
-                [this._idInstructorProfesion, profesion_idprofesion]
-            );
-            
-            if (!existeRelacion || existeRelacion.length === 0) {
-                await conexion.execute("ROLLBACK;");
-                return { success: false, mensaje: "La relación instructor-profesión no existe." };
-            }
+           
             
             
             const result = await conexion.execute(
-                "UPDATE instructor_has_profesion SET instructor_idinstructor = ?, profesion_idprofesion = ? WHERE instructor_idinstructor = ? AND profesion_idprofesion = ?;", 
-                [instructor_idinstructor, profesion_idprofesion, this._idInstructorProfesion, profesion_idprofesion]
+                `UPDATE instructor_has_profesion
+         SET instructor_idinstructor = ?
+         WHERE instructor_idinstructor = ?
+           AND profesion_idprofesion   = ?;`, 
+                [instructor_idinstructor, oldi, profesion_idprofesion]
             );
             
             if (result && typeof result.affectedRows === "number" && result.affectedRows > 0) {
                 const { rows: relacion } = await conexion.execute(
-                    "SELECT * FROM instructor_has_profesion WHERE instructor_idinstructor = ? AND profesion_idprofesion = ?;", 
+                    `SELECT *
+                    FROM instructor_has_profesion
+                    WHERE instructor_idinstructor = ?
+                      AND profesion_idprofesion   = ?;`,
                     [instructor_idinstructor, profesion_idprofesion]
                 );
                 
@@ -106,7 +104,7 @@ export class InstructorProfesion {
     
     public async eliminarInstructorProfesion(): Promise<{ success: boolean; mensaje: string }> {
         try {
-            if (!this._objInstructorProfesion && !this._idInstructorProfesion) {
+            if (!this._objInstructorProfesion && !this._oldidInstructorProfesion) {
                 throw new Error("No se ha proporcionado información para eliminar.");
             }
             
@@ -121,7 +119,7 @@ export class InstructorProfesion {
                 profesion_id = this._objInstructorProfesion.profesion_idprofesion;
             } else {
               
-                instructor_id = this._idInstructorProfesion as number;
+                instructor_id = this._oldidInstructorProfesion as number;
                 
                
                 const { rows: relaciones } = await conexion.execute(

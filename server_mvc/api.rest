@@ -6,25 +6,25 @@ POST http://localhost:8000/aprendices
 Content-Type: application/json
 
 {
-    "nombre": "Sebastian",
+    "nombre": "jhojan",
     "apellido": "Preciado",
-    "email": "sebas@gmail.com",
-    "telefono": "3231483822"
+    "email": "jh@gmail.com",
+    "telefono": "3231483833"
 }
 ###
 
-PUT http://localhost:8000/aprendices/2
+PUT http://localhost:8000/aprendices/1
 Content-Type: application/json
 
 {
-  "nombre": "Juan",
-  "apellido": "Silva",
-  "email": "juan.Silva@sena.com",
+  "nombre": "Sebas",
+  "apellido": "Preciado",
+  "email": "sebsss@sena.com",
   "telefono": "3011708855"
 }
 ###
 
-DELETE http://localhost:8000/aprendices/3
+DELETE http://localhost:8000/aprendices/2
 ###
 
 # Profesiones
@@ -35,7 +35,7 @@ POST http://localhost:8000/profesion
 Content-Type: application/json
 
 {
-    "nombre_profesion": "ingeniero de software"
+    "nombre_profesion": "ingeniero de mecatronica"
 }
 ###
 
@@ -58,10 +58,10 @@ POST http://localhost:8000/instructores
 Content-Type: application/json
 
 {
- "nombre": "Jhonatan",
- "apellido": "Preciado",
- "email": "jho@gmail.com",
- "telefono": "3211234531"
+ "nombre": "Juanito",
+ "apellido": "gomez",
+ "email": "jug@gmail.com",
+ "telefono": "3321234523"
 }
 ###
 
@@ -87,7 +87,7 @@ POST http://localhost:8000/programas
 Content-Type: application/json
 
 {
-   "nombre_programa": "ADSO"
+   "nombre_programa": "Mecatronica"
 }
 ###
 
@@ -110,11 +110,11 @@ POST http://localhost:8000/fichas
 Content-Type: application/json
 
 {
-  "codigo": "2827167",
+  "codigo": "2827132",
   "fechaInicioL": "2024-07-12",
   "fechaFinL": "2026-04-12",
   "fechaFinP": "2026-10-20",
-  "idPrograma": 1
+  "idPrograma": 2
 }
 ###
 
@@ -141,23 +141,23 @@ POST http://localhost:8000/fichaAprendiz
 Content-Type: application/json
 
 {
- "idFicha": 1,
- "idAprendiz": 1,
- "idInstructor": 1
+ "idFicha": 2,
+ "idAprendiz": 4,
+ "idInstructor": 2
 }
 ###
 
-PUT http://localhost:8000/fichaAprendiz/1
+PUT http://localhost:8000/fichaAprendiz/2
 Content-Type: application/json
 
 {
- "idFicha": 1,
- "idAprendiz": 2,
- "idInstructor": 1
+ "idFicha": 2,
+ "idAprendiz": 4,
+ "idInstructor": 3
 }
 ###
 
-DELETE http://localhost:8000/fichaAprendiz/1
+DELETE http://localhost:8000/fichaAprendiz/2
 ###
 
 # Instructor-Profesion
@@ -168,19 +168,19 @@ POST http://localhost:8000/instructorProfesion
 Content-Type: application/json
 
 {
- "idInstructor": 1,
- "idProfesion": 1
-}
-###
-
-PUT http://localhost:8000/instructorProfesion/1
-Content-Type: application/json
-
-{
- "idInstructor": 1,
+ "idInstructor": 3,
  "idProfesion": 2
 }
 ###
 
-DELETE http://localhost:8000/instructorProfesion/1
+PUT http://localhost:8000/instructorProfesion/3
+Content-Type: application/json
+
+{
+ "nuevoID":2,
+ "idProfesion": 1
+}
+###
+
+DELETE http://localhost:8000/instructorProfesion/3
 ###
